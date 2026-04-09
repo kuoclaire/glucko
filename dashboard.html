@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glucko - Dashboard</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-body">
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Glucko</h2>
+                <div class="doctor-info" id="sidebar-user-info">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-tab="tab-dashboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="8" height="10" rx="2"></rect>
+                        <rect x="13" y="3" width="8" height="10" rx="2"></rect>
+                        <rect x="3" y="16" width="18" height="5" rx="2"></rect>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="#" class="nav-item" data-tab="tab-patient-search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    Patient Search
+                </a>
+                <a href="#" class="nav-item" data-tab="tab-add-visit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+                        <path d="M14 3v5h5M12 18v-6M9 15h6" />
+                    </svg>
+                    Appointment Log
+                </a>
+                <a href="#" class="nav-item" data-tab="tab-databases">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                        <path d="M3 5V19A9 3 0 0 0 21 19V5"></path>
+                        <path d="M3 12A9 3 0 0 0 21 12"></path>
+                    </svg>
+                    Permissions Control
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <h1 id="page-title">Dashboard</h1>
+            </header>
+
+            <div class="content-container">
+                <!-- TAB 1: DATABASES -->
+                <section id="tab-databases" class="tab-pane">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Employees</h3>
+                            <button class="btn-primary" onclick="openAddEmployeeModal()">+ Add User</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="employees-table">
+                                <thead>
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Hospital</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 2: PATIENT SEARCH -->
+                <section id="tab-patient-search" class="tab-pane">
+                    <div class="search-bar">
+                        <div style="position: relative; flex: 1; display: flex; align-items: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="var(--gray)" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" style="position: absolute; left: 12px; pointer-events: none;">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="patient-search-input" class="input-field"
+                                placeholder="Search patients by name or ID..." style="padding-left: 40px;">
+                        </div>
+                        <button class="btn-secondary" onclick="searchPatients()">Search</button>
+                    </div>
+
+                    <div id="patient-list" class="grid-cards">
+                        <!-- Populated via JS -->
+                    </div>
+
+                    <!-- Patient Profile Detail View (Hidden default) -->
+                    <div id="patient-profile-view" class="hidden">
+                        <button class="btn-text" onclick="closePatientProfile()">← Back to Search</button>
+                        <div class="profile-header card">
+                            <div class="profile-basic">
+                                <h2 id="pp-name">John Doe</h2>
+                                <p id="pp-info">ID: P-1234 | Age: 42 | Type 1 Diabetes</p>
+                            </div>
+                            <div class="profile-stats">
+                                <div class="stat-box">
+                                    <span class="stat-label">Latest Glucose</span>
+                                    <span class="stat-value" id="pp-latest-glucose">110 mg/dL</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-label">GMI</span>
+                                    <span class="stat-value" id="pp-gmi">6.0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-grid">
+                            <div class="card chart-card" style="grid-column: 1 / span 2;">
+                                <h3>Glucose Trends (24 Hrs)</h3>
+                                <div style="overflow-x: auto; white-space: nowrap; width: 100%;">
+                                    <div style="min-width: 800px; height: 250px;">
+                                        <canvas id="glucose-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Left Col: Health Records -->
+                            <div class="card health-records-card">
+                                <div class="card-header" style="margin-bottom: 0;">
+                                    <h3>Recent Health Records</h3>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <select class="input-field" style="padding: 0.25rem 0.5rem; height: auto;">
+                                            <option>May 2025</option>
+                                            <option>April 2025</option>
+                                        </select>
+                                        <button class="btn-secondary" style="padding: 0.25rem 0.5rem;"
+                                            onclick="alert('Downloading Data...')">Download</button>
+                                    </div>
+                                </div>
+                                <ul class="record-list" id="pp-records" style="margin-top: 1rem;">
+                                    <!-- Populated via JS -->
+                                </ul>
+                            </div>
+                            <!-- Right Col: Activities -->
+                            <div class="card activity-sidebar">
+                                <h3>Daily Activities</h3>
+                                <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                                    <div class="stat-box" style="text-align: left;"><strong>Exercise:</strong> 30 mins
+                                        Walking</div>
+                                    <div class="stat-box" style="text-align: left;"><strong>Water Intake:</strong> 64 oz
+                                    </div>
+                                    <div class="stat-box" style="text-align: left;"><strong>Food Intake:</strong> 1800
+                                        kcal (Tracked)</div>
+                                    <div class="stat-box" style="text-align: left;"><strong>Sleep:</strong> 7h 15m</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 3: Log Appointment -->
+                <section id="tab-add-visit" class="tab-pane">
+                    <div class="card">
+                        <h3>Add Appointment Log</h3>
+                        <p class="subtitle">Search for a patient with Patient ID or Name to begin a record.</p>
+                        <div class="form-group row-flex">
+                            <div style="position: relative; flex: 1; display: flex; align-items: center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="var(--gray)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    style="position: absolute; left: 12px; pointer-events: none;">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <input type="text" id="visit-patient-search" class="input-field"
+                                    placeholder="Patient ID or Search by Name..." style="padding-left: 40px;"
+                                    oninput="renderPatientAutocomplete(this.value)">
+                            </div>
+                            <button class="btn-secondary" onclick="simulateSelectPatientForVisit(this)">Select
+                                Patient</button>
+                        </div>
+
+                        <div id="visit-form-container" class="hidden">
+                            <hr class="divider">
+                            <h4 id="visit-patient-name" class="margin-bottom-sm">Selected: John Doe (P-1234)</h4>
+
+                            <form id="health-visit-form">
+                                <div class="form-group">
+                                    <label>Health Records Reviewed</label>
+                                    <div class="checkbox-group">
+                                        <label><input type="checkbox" id="reviewed-glucose"> Glucose Charts</label>
+                                        <label><input type="checkbox" id="reviewed-meds"> Medication Logs</label>
+                                        <label><input type="checkbox" id="reviewed-meals"> Activity Logs</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="visit-prescription">Prescriptions Prescribed</label>
+                                    <textarea id="visit-prescription" class="input-field auto-resize" rows="1"
+                                        placeholder="Insulin dosage changes, new medications..."
+                                        oninput="this.style.height='auto';this.style.height=(this.scrollHeight)+'px';"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="visit-notes">Doctor's Notes</label>
+                                    <textarea id="visit-notes" class="input-field auto-resize" rows="1"
+                                        placeholder="Observation notes, lifestyle recommendations..."
+                                        oninput="this.style.height='auto';this.style.height=(this.scrollHeight)+'px';"></textarea>
+                                </div>
+
+                                <button type="button" class="btn-primary" onclick="submitHealthVisit()">Save Visit
+                                    Record</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 4: DASHBOARD -->
+                <section id="tab-dashboard" class="tab-pane active">
+                    <div style="padding: 0;">
+                        <div class="appointments-header row-flex"
+                            style="justify-content: space-between; margin-bottom: 1.5rem;">
+                            <h3 id="appointments-section-title">Appointments</h3>
+                            <div class="row-flex" style="gap: 1rem;">
+                                <div id="upcoming-controls" style="flex: 1;">
+                                    <select id="upcoming-sort" class="input-field"
+                                        style="height: 36px; padding: 4px 28px 4px 12px; font-size: 0.9rem; width: 100%; min-width: 150px; background-position: right 8px center; background-size: 16px;"
+                                        onchange="renderHistory()">
+                                        <option value="" disabled selected hidden>Sort by</option>
+                                        <option value="time">Upcoming Appointment</option>
+                                        <option value="name">Alphabetical</option>
+                                    </select>
+                                </div>
+                                <div id="past-controls" class="hidden"
+                                    style="position: relative; display: flex; align-items: center; gap: 0.5rem; flex: 1;">
+                                    <input type="date" id="past-date" class="input-field" style="height: 36px; padding: 4px 8px; font-size: 0.9rem;" onchange="renderHistory()">
+                                    <div style="position: relative;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                            fill="none" stroke="var(--gray)" stroke-width="1.5" stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            style="position: absolute; left: 10px; top: 10px; pointer-events: none;">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        <input type="text" id="past-search" class="input-field"
+                                            placeholder="Search past logs..."
+                                            style="height: 36px; padding: 4px 12px 4px 32px; font-size: 0.9rem; width: 250px;"
+                                            oninput="renderHistory()">
+                                    </div>
+                                </div>
+                                <div class="small-tabs">
+                                    <button class="btn-text tab-btn active" id="tab-upcoming-btn"
+                                        onclick="switchAppointmentTab('upcoming')">Upcoming</button>
+                                    <button class="btn-text tab-btn" id="tab-past-btn"
+                                        onclick="switchAppointmentTab('past')">Past</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="appointments-upcoming" class="bento-grid">
+                            <!-- Populated via JS -->
+                        </div>
+
+                        <div id="appointments-past" class="bento-grid hidden">
+                            <!-- Populated via JS -->
+                        </div>
+
+                        <div id="recent-activities-section">
+                            <div class="appointments-header row-flex"
+                                style="justify-content: space-between; margin-top: 2.5rem; margin-bottom: 1rem;">
+                                <h3>Recent Activity</h3>
+                            </div>
+                            <div id="recent-activities-list" class="card" style="padding: 0; width: 100%;">
+                                <!-- Populated via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Employee Modal -->
+    <div id="employee-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="em-title">Add/Edit User</h3>
+                <span class="close-modal" onclick="closeModal('employee-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Employee ID <span class="required">*</span></label>
+                    <input type="text" id="em-id" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Name <span class="required">*</span></label>
+                    <input type="text" id="em-name" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number <span class="required">*</span></label>
+                    <input type="text" id="em-phone" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Email <span class="required">*</span></label>
+                    <input type="email" id="em-email" class="input-field" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-text" onclick="closeModal('employee-modal')">Cancel</button>
+                <button class="btn-primary" onclick="saveEmployee()">Save Info</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Activity Modal -->
+    <div id="edit-activity-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="ea-title">Edit Log</h3>
+                <span class="close-modal" onclick="closeModal('edit-activity-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="ea-index">
+                <div class="form-group">
+                    <label>Health Records Reviewed</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="ea-reviewed-glucose"> Glucose Charts</label>
+                        <label><input type="checkbox" id="ea-reviewed-meds"> Medication Logs</label>
+                        <label><input type="checkbox" id="ea-reviewed-meals"> Activity Logs</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Prescriptions</label>
+                    <textarea id="ea-rx" class="input-field auto-resize" rows="2"
+                        oninput="this.style.height='auto';this.style.height=(this.scrollHeight)+'px';"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Doctor's Notes</label>
+                    <textarea id="ea-notes" class="input-field auto-resize" rows="2"
+                        oninput="this.style.height='auto';this.style.height=(this.scrollHeight)+'px';"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-text" onclick="closeModal('edit-activity-modal')">Cancel</button>
+                <button class="btn-primary" onclick="saveActivity()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/mockData.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>
