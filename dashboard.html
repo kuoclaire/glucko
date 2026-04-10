@@ -21,7 +21,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>Glucko</h2>
+                <img src="glucko-logo.png" alt="Glucko Logo" class="sidebar-logo" style="width: 120px; height: auto; margin-bottom: 0.5rem; display: block;">
                 <div class="doctor-info" id="sidebar-user-info">
                     <!-- Populated via JS -->
                 </div>
@@ -123,7 +123,9 @@
                             <input type="text" id="patient-search-input" class="input-field"
                                 placeholder="Search patients by name or ID..." style="padding-left: 40px;">
                         </div>
-                        <button class="btn-secondary" onclick="searchPatients()">Search</button>
+                        <button class="btn-primary" onclick="searchPatients()">Search</button>
+                        <button class="btn-secondary hidden" id="clear-search-btn" onclick="clearPatientSearch()"
+                            style="background-color: var(--lb);">Clear Search</button>
                     </div>
 
                     <div id="patient-list" class="grid-cards">
@@ -132,61 +134,120 @@
 
                     <!-- Patient Profile Detail View (Hidden default) -->
                     <div id="patient-profile-view" class="hidden">
-                        <button class="btn-text" onclick="closePatientProfile()">← Back to Search</button>
-                        <div class="profile-header card">
+                        <button class="btn-text" onclick="closePatientProfile()" style="margin-bottom: 0.5rem;">← Back
+                            to Search</button>
+                        <div class="profile-header card" style="align-items: center; display: flex;">
                             <div class="profile-basic">
-                                <h2 id="pp-name">John Doe</h2>
-                                <p id="pp-info">ID: P-1234 | Age: 42 | Type 1 Diabetes</p>
+                                <h2 style="margin-bottom: 0.25rem;"><span id="pp-name">John Doe</span> <em id="pp-id"
+                                        style="font-weight: 400; color: var(--gray); font-size: 1.15rem;">(P-1234)</em>
+                                </h2>
+                                <p id="pp-info" style="font-size: 0.95rem; color: var(--gray); margin-bottom: 0.5rem;">
+                                    Age: 42 • Birthday: 1984-05-12 • Weight: 185 lbs</p>
+                                <p id="pp-medical" style="font-size: 0.9rem; color: var(--db);"><span
+                                        style="font-weight: 600;">Type 1 Diabetes</span> — Humalog (12u before meals)
+                                </p>
                             </div>
-                            <div class="profile-stats">
-                                <div class="stat-box">
-                                    <span class="stat-label">Latest Glucose</span>
-                                    <span class="stat-value" id="pp-latest-glucose">110 mg/dL</span>
-                                </div>
-                                <div class="stat-box">
-                                    <span class="stat-label">GMI</span>
-                                    <span class="stat-value" id="pp-gmi">6.0%</span>
+                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
+                                <button class="btn-secondary" onclick="openEditPatientModal()">Edit Info</button>
+                                <div class="profile-stats">
+                                    <div class="stat-box"
+                                        style="display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 0.25rem;">
+                                        <span class="stat-label">Latest Glucose</span>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span class="stat-value" id="pp-latest-glucose">110 mg/dL</span>
+                                            <span id="pp-status-badge" class="status-indicator"></span>
+                                        </div>
+                                    </div>
+                                    <div class="stat-box"
+                                        style="display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 0.25rem;">
+                                        <span class="stat-label">GMI</span>
+                                        <span class="stat-value" id="pp-gmi">6.0%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="dashboard-grid">
                             <div class="card chart-card" style="grid-column: 1 / span 2;">
-                                <h3>Glucose Trends (24 Hrs)</h3>
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h3 id="pp-chart-title" style="margin-bottom: 0;">Glucose Chart (today)</h3>
+                                    <select class="input-field" id="pp-avg-select"
+                                        style="width: 20%; padding: 6px 12px; height: 35px;"
+                                        onchange="updateActivityAverage()">
+                                        <option value="Today">Today</option>
+                                        <option value="This week">This week</option>
+                                        <option value="This month">This month</option>
+                                    </select>
+                                </div>
                                 <div style="overflow-x: auto; white-space: nowrap; width: 100%;">
                                     <div style="min-width: 800px; height: 250px;">
                                         <canvas id="glucose-chart"></canvas>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Left Col: Health Records -->
-                            <div class="card health-records-card">
+                            <!-- Left Col: Activity Log & Daily Activities -->
+                            <div class="card health-records-card" style="grid-column: 1 / 2;">
                                 <div class="card-header" style="margin-bottom: 0;">
-                                    <h3>Recent Health Records</h3>
-                                    <div style="display: flex; gap: 0.5rem;">
-                                        <select class="input-field" style="padding: 0.25rem 0.5rem; height: auto;">
-                                            <option>May 2025</option>
-                                            <option>April 2025</option>
-                                        </select>
-                                        <button class="btn-secondary" style="padding: 0.25rem 0.5rem;"
-                                            onclick="alert('Downloading Data...')">Download</button>
-                                    </div>
+                                    <h3>Activity Log</h3>
                                 </div>
                                 <ul class="record-list" id="pp-records" style="margin-top: 1rem;">
                                     <!-- Populated via JS -->
                                 </ul>
+
+                                <h4
+                                    style="margin-top: 1.5rem; margin-bottom: 1rem; color: var(--gray); font-size: 0.95rem;">
+                                    Daily Activities</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;"
+                                    id="pp-daily-activities">
+                                    <div class="stat-box" style="text-align: left; background-color: var(--lb);"><strong
+                                            style="display:block; font-size: 0.8rem; color: var(--gray);">Exercise</strong>
+                                        30 mins Walking</div>
+                                    <div class="stat-box" style="text-align: left; background-color: var(--lb);"><strong
+                                            style="display:block; font-size: 0.8rem; color: var(--gray);">Water
+                                            Intake</strong> 64 oz</div>
+                                    <div class="stat-box" style="text-align: left; background-color: var(--lb);"><strong
+                                            style="display:block; font-size: 0.8rem; color: var(--gray);">Food
+                                            Intake</strong> 1800 kcal (Tracked)</div>
+                                    <div class="stat-box" style="text-align: left; background-color: var(--lb);"><strong
+                                            style="display:block; font-size: 0.8rem; color: var(--gray);">Sleep</strong>
+                                        7h 15m</div>
+                                </div>
                             </div>
-                            <!-- Right Col: Activities -->
-                            <div class="card activity-sidebar">
-                                <h3>Daily Activities</h3>
-                                <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
-                                    <div class="stat-box" style="text-align: left;"><strong>Exercise:</strong> 30 mins
-                                        Walking</div>
-                                    <div class="stat-box" style="text-align: left;"><strong>Water Intake:</strong> 64 oz
+                            <!-- Right Col: Health Records Export -->
+                            <div class="card activity-sidebar" style="grid-column: 2 / 3;">
+                                <h3>Health Records</h3>
+                                <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+                                    <div>
+                                        <label
+                                            style="display:block; font-size: 0.85rem; color: var(--gray); margin-bottom: 0.25rem;">Select
+                                            Date <span class="required">*</span></label>
+                                        <input type="date" id="hr-date" class="input-field"
+                                            style="padding: 8px 12px; height: 40px; font-size: 0.9rem;" required>
                                     </div>
-                                    <div class="stat-box" style="text-align: left;"><strong>Food Intake:</strong> 1800
-                                        kcal (Tracked)</div>
-                                    <div class="stat-box" style="text-align: left;"><strong>Sleep:</strong> 7h 15m</div>
+                                    <div>
+                                        <label
+                                            style="display:block; font-size: 0.85rem; color: var(--gray); margin-bottom: 0.25rem;">Timeframe
+                                            <span class="required">*</span></label>
+                                        <select class="input-field" id="hr-timeframe"
+                                            style="padding: 8px 12px; height: 40px; font-size: 0.9rem;" required>
+                                            <option value="">Select Timeframe</option>
+                                            <option value="Today">Today</option>
+                                            <option value="This Week">This Week</option>
+                                            <option value="This Month">This Month</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn-primary" style="margin-top: 1rem; justify-content: center;"
+                                        onclick="downloadHealthRecords()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        Download Records
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -268,11 +329,13 @@
                                 </div>
                                 <div id="past-controls" class="hidden"
                                     style="position: relative; display: flex; align-items: center; gap: 0.5rem; flex: 1;">
-                                    <input type="date" id="past-date" class="input-field" style="height: 36px; padding: 4px 8px; font-size: 0.9rem;" onchange="renderHistory()">
+                                    <input type="date" id="past-date" class="input-field"
+                                        style="height: 36px; padding: 4px 8px; font-size: 0.9rem;"
+                                        onchange="renderHistory()">
                                     <div style="position: relative;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                            fill="none" stroke="var(--gray)" stroke-width="1.5" stroke-linecap="round"
-                                            stroke-linejoin="round"
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="var(--gray)" stroke-width="1.5"
+                                            stroke-linecap="round" stroke-linejoin="round"
                                             style="position: absolute; left: 10px; top: 10px; pointer-events: none;">
                                             <circle cx="11" cy="11" r="8"></circle>
                                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -332,12 +395,35 @@
                     <input type="text" id="em-name" class="input-field" required>
                 </div>
                 <div class="form-group">
-                    <label>Phone Number <span class="required">*</span></label>
-                    <input type="text" id="em-phone" class="input-field" required>
+                    <label>Hospital <span class="required">*</span></label>
+                    <select id="em-hospital" class="input-field"></select>
+                </div>
+                <div class="form-group" style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <input type="text" id="em-phone" class="input-field" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Email <span class="required">*</span></label>
+                        <input type="email" id="em-email" class="input-field" required>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Email <span class="required">*</span></label>
-                    <input type="email" id="em-email" class="input-field" required>
+                    <label>Password <span class="required">*</span></label>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="password" id="em-password" class="input-field" required
+                            style="padding-right: 40px;">
+                        <button type="button" class="btn-text"
+                            style="position: absolute; right: 12px; padding: 0; display: flex; align-items: center;"
+                            onclick="const input = document.getElementById('em-password'); const isPwd = input.type === 'password'; input.type = isPwd ? 'text' : 'password'; this.innerHTML = isPwd ? '<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'18\' height=\'18\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'var(--gray)\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24\'></path><line x1=\'1\' y1=\'1\' x2=\'23\' y2=\'23\'></line></svg>' : '<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'18\' height=\'18\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'var(--gray)\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\'></path><circle cx=\'12\' cy=\'12\' r=\'3\'></circle></svg>';">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="var(--gray)" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -378,6 +464,51 @@
             <div class="modal-footer">
                 <button class="btn-text" onclick="closeModal('edit-activity-modal')">Cancel</button>
                 <button class="btn-primary" onclick="saveActivity()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Patient Modal -->
+    <div id="edit-patient-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Edit Patient Info</h2>
+                <button class="btn-text" style="font-size: 1.5rem;"
+                    onclick="closeModal('edit-patient-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="ep-name" class="input-field" required>
+                </div>
+                <div class="form-group" style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label>Birthday (YYYY-MM-DD)</label>
+                        <input type="date" id="ep-birthday" class="input-field"
+                            style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Weight (lbs or kg)</label>
+                        <input type="text" id="ep-weight" class="input-field">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Diabetes Type</label>
+                    <select id="ep-type" class="input-field">
+                        <option value="Type 1 Diabetes">Type 1 Diabetes</option>
+                        <option value="Type 2 Diabetes">Type 2 Diabetes</option>
+                        <option value="Gestational Diabetes">Gestational Diabetes</option>
+                        <option value="Pre-Diabetes">Pre-Diabetes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Prescribed Medications</label>
+                    <input type="text" id="ep-meds" class="input-field" placeholder="e.g., Humalog (12u before meals)">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('edit-patient-modal')">Cancel</button>
+                <button class="btn-primary" onclick="saveEditPatient()">Update Info</button>
             </div>
         </div>
     </div>
